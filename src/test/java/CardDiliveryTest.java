@@ -1,9 +1,13 @@
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Configuration;
-import com.codeborne.selenide.SelenideElement;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 
-import static com.codeborne.selenide.Selenide.$x;
-import static com.codeborne.selenide.Selenide.open;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+import static com.codeborne.selenide.Selenide.*;
 
 
 public class CardDiliveryTest {
@@ -11,15 +15,18 @@ public class CardDiliveryTest {
     @Test
     void shoulCardDesign() {
         Configuration.holdBrowserOpen = true;
-
+        String currentDate = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.YYYY"));
         open("http://localhost:9999/");
-        $x("//span[@data-test-id='city']").setValue("См");
-        $x("//span[contains(text(),'Смоленск')]//parent::div").click();
-        $x("//span[@data-test-id='date']").setValue("27.03.2023");
-        $x("//span[@data-test-id='name']").setValue("Сидоров-Петров Иван");
-        $x("//span[@data-test-id='phone']").setValue("+79200000000");
-        $x("//label[@data-test-id='agreement']").click();
+
+        $("[data-test-id=city] input").setValue("Смоленск");
+        $("[data-test-id=date]").click();
+        $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.DELETE);
+        $("[data-test-id=date] input").sendKeys(currentDate);
+        $("[data-test-id=name] input").setValue("Сидоров-Петров Иван");
+        $("[data-test-id=phone] input").setValue("+79200000000");
+        $("[data-test-id='agreement']").click();
         $x("//span[@class='button__content']//parent::button").click();
+        $("[data-test-id=notification]").shouldBe(Condition.visible, Duration.ofSeconds(15));
 
 
     }
