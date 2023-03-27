@@ -11,11 +11,14 @@ import static com.codeborne.selenide.Selenide.*;
 
 
 public class CardDiliveryTest {
+    public String generateDate(long numberOfDays, String pattern) {
+        return LocalDate.now().plusDays(numberOfDays).format(DateTimeFormatter.ofPattern(pattern));
+    }
 
     @Test
     void shoulCardDesign() {
         Configuration.holdBrowserOpen = true;
-        String currentDate = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.YYYY"));
+        String currentDate = generateDate(3, "dd.MM.yyyy");
         open("http://localhost:9999/");
 
         $("[data-test-id=city] input").setValue("Смоленск");
@@ -26,7 +29,8 @@ public class CardDiliveryTest {
         $("[data-test-id=phone] input").setValue("+79200000000");
         $("[data-test-id='agreement']").click();
         $x("//span[@class='button__content']//parent::button").click();
-        $("[data-test-id=notification]").shouldBe(Condition.visible, Duration.ofSeconds(15));
+        $("[data-test-id='notification']").shouldBe(Condition.visible, Duration.ofSeconds(15))
+                .shouldHave(Condition.text("Встреча успешно забронирована на " + currentDate));
 
 
     }
